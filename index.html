@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Socket.IO Naval-Battle</title>
+  <style>
+    /* body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; } */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 99vh;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form> -->
+  <canvas></canvas>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+
+    var messages = document.getElementById('messages');
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+
+    var shooting = true;
+
+
+
+    const canvas = document.querySelector('canvas')
+    const c = canvas.getContext('2d')
+
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
+
+    class Player {
+      constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+      }
+
+      draw() {
+        c.beginPath()
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        c.fillStyle = this.color
+        c.fill()
+      }
+    }
+
+    class Projectile {
+      constructor(x, y, radius, color, velocity) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+      }
+      draw() {
+        c.beginPath()
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        c.fillStyle = this.color
+        c.fill()
+      }
+      update() {
+        this.draw()
+        this.x += this.velocity.x
+        this.y += this.velocity.y
+      }
+    }
+
+    const x = canvas.width / 10
+    const y = canvas.height / 2
+
+    const player = new Player(x, y, 30, 'blue')
+
+    const projectiles = []
+
+    socket.on('shot-reachs', function (msg) {
+
+      console.log(msg)
+
+
+      const projectile = new Projectile(...msg)
+      projectiles.push(projectile)
+    });
+
+
+    function animate() {
+      requestAnimationFrame(animate)
+      c.clearRect(0, 0, canvas.width, canvas.height)
+      player.draw();
+
+      projectiles.forEach((projectile, index) => {
+        projectile.update()
+
+        if (projectile.x - projectile.radius < 0) {
+          setTimeout(() => {
+            console.log(projectile.x)
+            console.log(projectile.radius)
+            console.log(projectile.x - projectile.radius)
+
+            socket.emit('shot-reachs', { ...projectile });
+
+            projectiles.splice(index, 1)
+          }, 0)
+        }
+      })
+
+
+      // projectile.draw()
+      // projectile.update()
+    }
+
+    addEventListener('click', event => {
+      const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 10)
+      const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle),
+      }
+      projectiles.push(new Projectile(
+        canvas.width / 10,
+        canvas.height / 2,
+        5,
+        'red',
+        velocity
+      ))
+    })
+
+
+    animate()
+
+  </script>
+</body>
+
+</html>
