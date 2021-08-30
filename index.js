@@ -9,20 +9,15 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// io.on('connection', (socket) => {
-//   console.log('a user connected');
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-// });
-
 io.on('connection', (socket) => {
-  socket.on('shot-reachs', (msg) => {
-    io.emit('shot-reachs', msg);
-    console.log(msg)
+  socket.on('shot-reachs-left', (msg) => {
+    socket.broadcast.emit('shot-reachs-left', msg);
+  });
+  socket.on('shot-reachs-right', (msg) => {
+    socket.broadcast.emit('shot-reachs-right', msg);
   });
 });
 
 server.listen(3000, () => {
-  console.log('listening on *:3000');
+  console.log('listening on port 3000');
 });

@@ -78,7 +78,7 @@
     }
 
     class Projectile {
-      constructor(x, y, radius, color, velocity) {
+      constructor({ x, y, radius, color, velocity }) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -105,16 +105,6 @@
 
     const projectiles = []
 
-    socket.on('shot-reachs', function (msg) {
-
-      console.log(msg)
-
-
-      const projectile = new Projectile(...msg)
-      projectiles.push(projectile)
-    });
-
-
     function animate() {
       requestAnimationFrame(animate)
       c.clearRect(0, 0, canvas.width, canvas.height)
@@ -124,15 +114,22 @@
         projectile.update()
 
         if (projectile.x - projectile.radius < 0) {
-          setTimeout(() => {
-            console.log(projectile.x)
-            console.log(projectile.radius)
-            console.log(projectile.x - projectile.radius)
+          socket.emit('shot-reachs-left', projectile);
+          console.log(index)
+          projectiles.splice(index, 1)
+        }
 
-            socket.emit('shot-reachs', { ...projectile });
+        if (projectile.x - projectile.radius > canvas.width) {
+          socket.emit('shot-reachs-right', projectile);
+          projectiles.splice(index, 1)
+        }
 
-            projectiles.splice(index, 1)
-          }, 0)
+        if (projectile.y - projectile.radius > canvas.height) {
+          projectiles.splice(index, 1)
+        }
+
+        if (projectile.y - projectile.radius < 0) {
+          projectiles.splice(index, 1)
         }
       })
 
@@ -141,18 +138,33 @@
       // projectile.update()
     }
 
+    socket.on('shot-reachs-left', msg => {
+      console.log(msg)
+
+      projectiles.push(new Projectile({...msg, x: canvas.width}))
+    });
+
+    socket.on('shot-reachs-right', msg => {
+      console.log(msg)
+      projectiles.push(new Projectile({...msg, x: 5}))
+    });
+
+
     addEventListener('click', event => {
       const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 10)
       const velocity = {
-        x: Math.cos(angle),
-        y: Math.sin(angle),
+        x: Math.cos(angle) * 5,
+        y: Math.sin(angle) * 5,
       }
+
       projectiles.push(new Projectile(
-        canvas.width / 10,
-        canvas.height / 2,
-        5,
-        'red',
-        velocity
+        {
+          x: canvas.width / 10,
+          y: canvas.height / 2,
+          radius: 5,
+          color: 'red',
+          velocity,
+        }
       ))
     })
 
