@@ -138,6 +138,11 @@
       // projectile.update()
     }
 
+    var  reconnection = true,
+    reconnectionDelay = 5000,
+    reconnectionTry = 0;
+
+
     socket.on('shot-reachs-left', msg => {
       console.log(msg)
 
@@ -148,6 +153,21 @@
       console.log(msg)
       projectiles.push(new Projectile({...msg, x: 5}))
     });
+
+    socket.on("connect_error", function(e){
+        reconnectionTry++;
+        console.log("Reconnection attempt #"+reconnectionTry);
+    });
+
+    socket.on('disconnect', function () {
+    socket.disconnect();
+    console.log("client disconnected");
+    if(reconnection === true) {
+            setTimeout(function () {
+                    console.log("client trying reconnect");
+                    connectClient();
+                }, reconnectionDelay);
+        }})
 
 
     addEventListener('click', event => {
@@ -166,10 +186,11 @@
           velocity,
         }
       ))
-    })
+    }),
 
 
     animate()
+
 
   </script>
 </body>
