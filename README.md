@@ -56,7 +56,8 @@ Here is an example how you shouldn't do.
 ![Order demonstration](https://media.giphy.com/media/JipYpY3rZEGsRWFZDE/giphy.gif)
 
 
-### Comments
+
+### About
 
 This game is part of a project, to web development subject of computer engineering at FACENS.
 
