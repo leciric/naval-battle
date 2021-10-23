@@ -1,13 +1,15 @@
-# naval-battle
+# Socket Royale
+
+Socket Royale, is a multiplayer local shooting game.
+The winner is the one who survives.
 
 You need to have NodeJS installed to play
-
 
 ## step 1:
 git clone https://github.com/leciric/naval-battle.git
 
 ## step 2:
-open naval-battle folder
+open socket-royale folder
 
 ## step 3:
 run: npm install
@@ -18,6 +20,3 @@ run: yarn
 run: npm run start
 or
 run: yarn start
-
-
-## shots are fired by clicking
