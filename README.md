@@ -64,7 +64,7 @@ This game is part of a project, to web development subject of computer engineeri
 Here are the group members:
 
 * Leandro Ciric de Souza
-* 
+* Daniele dos Santos Rosa
 *
 *
 
