@@ -52,8 +52,6 @@
 
     var shooting = true;
 
-
-
     const canvas = document.querySelector('canvas')
     const c = canvas.getContext('2d')
 
@@ -115,7 +113,6 @@
 
         if (projectile.x - projectile.radius < 0) {
           socket.emit('shot-reachs-left', projectile);
-          console.log(index)
           projectiles.splice(index, 1)
         }
 
@@ -144,8 +141,6 @@
 
 
     socket.on('shot-reachs-left', msg => {
-      console.log(msg)
-
       projectiles.push(new Projectile({...msg, x: canvas.width}))
     });
 
