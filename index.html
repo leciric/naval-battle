@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Socket.IO Naval-Battle</title>
+  <title>Socket Royale</title>
   <style>
     /* body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
@@ -58,7 +58,6 @@
     canvas.width = innerWidth
     canvas.height = innerHeight
 
-
     class Player {
       constructor(x, y, radius, color) {
         this.x = x;
@@ -96,11 +95,13 @@
       }
     }
 
-    const x = canvas.width / 10
+    // posição onde o player irá iniciar
+    const x = canvas.width / 2
     const y = canvas.height / 2
 
     const player = new Player(x, y, 30, 'blue')
 
+    // array de projeteis disparados
     const projectiles = []
 
     function animate() {
@@ -135,46 +136,55 @@
       // projectile.update()
     }
 
-    var  reconnection = true,
-    reconnectionDelay = 5000,
-    reconnectionTry = 0;
+    var reconnection = true,
+      reconnectionDelay = 5000,
+      reconnectionTry = 0;
 
-
+    // socket fica ouvindo esperando pelo evento de tiro que atingir o lado esquerdo
     socket.on('shot-reachs-left', msg => {
-      projectiles.push(new Projectile({...msg, x: canvas.width}))
+      projectiles.push(new Projectile({ ...msg, x: canvas.width }))
     });
 
+    // socket fica ouvindo esperando pelo evento de tiro que atingir o lado direito
     socket.on('shot-reachs-right', msg => {
       console.log(msg)
-      projectiles.push(new Projectile({...msg, x: 5}))
+      projectiles.push(new Projectile({ ...msg, x: 5 }))
     });
 
-    socket.on("connect_error", function(e){
-        reconnectionTry++;
-        console.log("Reconnection attempt #"+reconnectionTry);
+    // caso ocorra algum erro durante a conexão com o socket
+    socket.on("connect_error", function (e) {
+      reconnectionTry++;
+      console.log("Reconnection attempt #" + reconnectionTry);
     });
 
     socket.on('disconnect', function () {
-    socket.disconnect();
-    console.log("client disconnected");
-    if(reconnection === true) {
-            setTimeout(function () {
-                    console.log("client trying reconnect");
-                    connectClient();
-                }, reconnectionDelay);
-        }})
+      socket.disconnect();
+      console.log("client disconnected");
+      if (reconnection === true) {
+        setTimeout(function () {
+          console.log("client trying reconnect");
+          connectClient();
+        }, reconnectionDelay);
+      }
+    })
 
-
+    // função que dispara os tiros por evento de click.
     addEventListener('click', event => {
-      const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 10)
+      // angulo que o projetil irá seguir
+      const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2)
+
+      // velocidade do projetil
       const velocity = {
         x: Math.cos(angle) * 5,
         y: Math.sin(angle) * 5,
       }
 
+
+      // instancia um novo projetil (ainda está com posição fixa de inicio, exatamente onde o player é instanciado)
+      // Iremos implementar para isso acompanhar a posição do player.
       projectiles.push(new Projectile(
         {
-          x: canvas.width / 10,
+          x: canvas.width / 2,
           y: canvas.height / 2,
           radius: 5,
           color: 'red',
@@ -183,10 +193,7 @@
       ))
     }),
 
-
-    animate()
-
-
+      animate()
   </script>
 </body>
 

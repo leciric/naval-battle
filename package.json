@@ -1,22 +1,22 @@
 {
-  "name": "naval-battle",
+  "name": "socket-royale",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leciric/naval-battle.git"
+    "url": "git+https://github.com/leciric/socket-royale.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/leciric/naval-battle/issues"
+    "url": "https://github.com/leciric/socket-royale/issues"
   },
-  "homepage": "https://github.com/leciric/naval-battle#readme",
+  "homepage": "https://github.com/leciric/socket-royale#readme",
   "dependencies": {
     "express": "^4.17.1",
     "socket.io": "^4.1.3"
