@@ -65,7 +65,7 @@ Here are the group members:
 
 * Leandro Ciric de Souza
 * Daniele dos Santos Rosa
-*
+* Bruno Cesar de Almeida Ribeiro
 *
 
 
