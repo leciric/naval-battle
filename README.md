@@ -57,7 +57,7 @@ Here is an example how you shouldn't do.
 
 
 
-### About
+### 📚 About
 
 This game is part of a project, to web development subject of computer engineering at FACENS.
 
