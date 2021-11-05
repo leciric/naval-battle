@@ -27,7 +27,9 @@
 <body>
   <canvas></canvas>
   <script src="/socket.io/socket.io.js"></script>
+
   <script>
+
     var socket = io();
 
 
@@ -44,11 +46,12 @@
     canvas.height = innerHeight
 
     class Player {
-      constructor(x, y, radius, color) {
+      constructor(x, y, radius, color, velocity) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = color;
+        this.velocity = velocity;
       }
 
       draw() {
@@ -56,6 +59,12 @@
         c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
         c.fillStyle = this.color
         c.fill()
+      }
+
+      update(velocity) {
+        this.draw()
+        this.x += velocity.x
+        this.y += velocity.y
       }
     }
 
@@ -80,6 +89,7 @@
       }
     }
 
+
     // posição onde o player irá iniciar
     const x = canvas.width / 2
     const y = canvas.height / 2
@@ -88,6 +98,8 @@
 
     // array de projeteis disparados
     const projectiles = []
+
+    const players = []
 
     function animate() {
       requestAnimationFrame(animate)
@@ -156,6 +168,9 @@
     // função que dispara os tiros por evento de click.
     addEventListener('click', event => {
       // angulo que o projetil irá seguir
+
+      console.log(event.clientY)
+      console.log(canvas.height / 2)
       const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2)
 
       // velocidade do projetil
@@ -169,14 +184,28 @@
       // Iremos implementar para isso acompanhar a posição do player.
       projectiles.push(new Projectile(
         {
-          x: canvas.width / 2,
-          y: canvas.height / 2,
+          x: player.x,
+          y: player.y,
           radius: 5,
           color: 'red',
           velocity,
         }
       ))
     }),
+
+      addEventListener('onkeydown', event => {
+        // angulo que o projetil irá seguir
+        const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2)
+
+        // velocidade do projetil
+        const velocity = {
+          x: Math.cos(angle) * 10,
+          y: Math.sin(angle) * 10,
+        }
+        player.update(velocity)
+
+
+      }),
 
       animate()
   </script>
