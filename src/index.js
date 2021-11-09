@@ -1,51 +1,118 @@
-const path = require("path");
-const express = require("express");
-const app = express();
-const http = require("http");
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
+import { connect, io } from "socket.io-client";
 
-app.use(express.static(path.join(__dirname, "public")));
+import Player from "./classes/Player";
+import Projectile from "./classes/Projectile";
 
-// lista de usuários conectados.
-const users = [];
+const socket = io();
 
-// ouve a conexão de um novo player.
-io.on("connection", (socket) => {
-  // assim que um player se conecta, o id (gerado pelo proprio socket), é adicionado no array de players
-  // essa é a razão pela qual a order que as telas devem estar organizadas tem que ser exatamente as mesmas da ordem de conexão.
-  users.push(socket.id);
-  // ouve o evento emitido pelo front-end, e emite o mesmo evento para o usuário ao lado
-  // (pego a posição do usuário que emitiu o evento e subtraio um para pegar o usuário da esquerda)
-  // caso o usuário da esquerda não exista (devido ao emissor ser o primeiro), pego o ultimo
-  socket.on("shot-reachs-left", (msg) => {
-    const shotIndex =
-      users.indexOf(socket.id) - 1 === -1
-        ? users.length - 1
-        : users.indexOf(socket.id) - 1;
+const canvas = document.querySelector("canvas");
+const context = canvas.getContext("2d");
 
-    io.to(users[shotIndex]).emit("shot-reachs-left", msg);
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const resizeCanvas = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+};
+
+window.addEventListener("resize", resizeCanvas, false);
+
+// posição onde o player irá iniciar
+const x = canvas.width / 2;
+const y = canvas.height / 2;
+
+const player = new Player(context, x, y, 30, "#ff0000");
+
+// array de projeteis disparados
+const projectiles = [];
+
+function animate() {
+  requestAnimationFrame(animate);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  player.draw(context);
+
+  projectiles.forEach((projectile, index) => {
+    projectile.update(context);
+
+    if (projectile.x - projectile.radius < 0) {
+      socket.emit("shot-reachs-left", projectile);
+      projectiles.splice(index, 1);
+    }
+
+    if (projectile.x - projectile.radius > canvas.width) {
+      socket.emit("shot-reachs-right", projectile);
+      projectiles.splice(index, 1);
+    }
+
+    if (projectile.y - projectile.radius > canvas.height) {
+      projectiles.splice(index, 1);
+    }
+
+    if (projectile.y - projectile.radius < 0) {
+      projectiles.splice(index, 1);
+    }
   });
+}
 
-  // ouve o evento emitido pelo front-end, e emite o mesmo evento para o usuário ao lado
-  // (pego a posição do usuário que emitiu o evento e subtraio um para pegar o usuário da direita)
-  // caso o usuário da direita não exista (devido ao emissor ser o ultimo), pego o primeiro
-  socket.on("shot-reachs-right", (msg) => {
-    const shotIndex =
-      users.indexOf(socket.id) + 1 === users.length
-        ? 0
-        : users.indexOf(socket.id) + 1;
-    io.to(users[shotIndex]).emit("shot-reachs-right", msg);
-  });
+let reconnection = true;
+let reconnectionDelay = 5000;
+let reconnectionTry = 0;
 
-  // ouve o evento de disconnect, e remove o usuário que disconectou da lista.
-  socket.on("disconnect", () => {
-    const remove = users.indexOf(socket.id);
-    users.splice(remove, 1);
-  });
+// socket fica ouvindo esperando pelo evento de tiro que atingir o lado esquerdo
+socket.on("shot-reachs-left", (msg) => {
+  projectiles.push(new Projectile({ ...msg, x: canvas.width }));
 });
 
-server.listen(3000, () => {
-  console.log("listening on port 3000");
+// socket fica ouvindo esperando pelo evento de tiro que atingir o lado direito
+socket.on("shot-reachs-right", (msg) => {
+  projectiles.push(new Projectile({ ...msg, x: 5 }));
 });
+
+// caso ocorra algum erro durante a conexão com o socket
+socket.on("connect_error", function () {
+  reconnectionTry++;
+  console.log("Reconnection attempt #" + reconnectionTry);
+});
+
+socket.on("disconnect", function () {
+  socket.disconnect();
+  console.log("client disconnected");
+  if (reconnection === true) {
+    setTimeout(function () {
+      console.log("client trying reconnect");
+      connect();
+    }, reconnectionDelay);
+  }
+});
+
+// função que dispara os tiros por evento de click.
+document.addEventListener("click", (event) => {
+  // angulo que o projetil irá seguir
+
+  const angle = Math.atan2(
+    event.clientY - canvas.height / 2,
+    event.clientX - canvas.width / 2
+  );
+
+  // velocidade do projetil
+  const velocity = {
+    x: Math.cos(angle) * 5,
+    y: Math.sin(angle) * 5,
+  };
+
+  // TODO:
+  // instancia um novo projetil (ainda está com posição fixa de inicio, exatamente onde o player é instanciado)
+  // Iremos implementar para isso acompanhar a posição do player.
+  projectiles.push(
+    new Projectile({
+      x: player.x,
+      y: player.y,
+      radius: 5,
+      color: "red",
+      velocity,
+    })
+  );
+});
+
+animate();

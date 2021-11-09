@@ -20,12 +20,22 @@
         width: 100%;
         height: 100%;
       }
+
+      #nipple {
+        position: absolute;
+        right: 10%;
+        bottom: calc(10% * 4 / 3);
+        width: 100px;
+        height: 100px;
+      }
     </style>
   </head>
 
   <body>
     <canvas></canvas>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="/script.js"></script>
+
+    <aside id="nipple"></aside>
+
+    <script src="bundle.js"></script>
   </body>
 </html>
