@@ -8,11 +8,12 @@ The winner is the one who survives.
 socket royale requires [node.js] to run.
 
 ### 💻 Tech
+
 socket royale uses some open source projects to work properly:
 
-  * [node.js]
-  * [socket.io]
-  * [nodemon]
+- [node.js]
+- [socket.io]
+- [nodemon]
 
 ### 🔨 Installation
 
@@ -23,7 +24,9 @@ To run this project, you must install all dependecies running the command below 
 ```sh
 $ npm install
 ```
+
 or
+
 ```sh
 $ yarn
 ```
@@ -33,7 +36,9 @@ after installing all dependecies run this command to start the application:
 ```sh
 $ npm run start
 ```
+
 or
+
 ```sh
 $ yarn start
 ```
@@ -45,8 +50,11 @@ localhost:3000
 ```
 
 ### 🎮 Playing
+
 To play socket royale, you must open the instances in the order you want to play.
+
 ##### DO NOT SHUFFLE SCREENS OR IT WILL NOT WORK PROPERLY
+
 Here is an example how to open multiple screens, and organize it to play.
 
 ![Order demonstration](https://media.giphy.com/media/FNMn6iG1CT8RCcAzHz/giphy.gif)
@@ -55,23 +63,18 @@ Here is an example how you shouldn't do.
 
 ![Order demonstration](https://media.giphy.com/media/JipYpY3rZEGsRWFZDE/giphy.gif)
 
-
-
 ### 📚 About
 
 This game is part of a project, to web development subject of computer engineering at FACENS.
 
 Here are the group members:
 
-* Leandro Ciric de Souza
-* Daniele dos Santos Rosa
-* Bruno Cesar de Almeida Ribeiro
-* Gabrield Almeida Rolle
+- Leandro Ciric de Souza
+- Daniele dos Santos Rosa
+- Bruno Cesar de Almeida Ribeiro
+- Gabriel Almeida Rolle
 
-
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
-   [node.js]: <http://nodejs.org>
-   [socket.io]: <https://socket.io/>
-   [nodemon]: <https://github.com/remy/nodemon>
-
+[//]: # "These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax"
+[node.js]: http://nodejs.org
+[socket.io]: https://socket.io/
+[nodemon]: https://github.com/remy/nodemon
