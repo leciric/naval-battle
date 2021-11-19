@@ -183,31 +183,35 @@
   </script>
 <style>
 
-#lifebar{
+#life{
     display: block;
     width: 298px;
     height: 28px;
-    line-height: 28px;
+    line-height: 25px;
     text-align: center;
     color: #000;
     border: 1px solid #000;
     position: relative;
+
+    top: -750px;
 }
 
-#life{
+#lifebar{
     display: block;
-    width: 15%;
+    width: 100%;
     height: 100%;
     background: red;
     position: absolute;
-    top: 0;
+    text-align: center;
+  
+    top: 0px;
     left: 0;
 }
 </style>
 
-<div id="lifebar">
-  <div id="life"></div>
-  <strong>15%</strong>
+<div id="life">
+  <div id="lifebar"></div>
+  <strong>100</strong>
 </div>
 
 </body>
