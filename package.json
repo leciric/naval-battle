@@ -2,10 +2,6 @@
   "name": "socket-royale",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "nodemon src/index.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leciric/socket-royale.git"
@@ -16,10 +12,5 @@
   "bugs": {
     "url": "https://github.com/leciric/socket-royale/issues"
   },
-  "homepage": "https://github.com/leciric/socket-royale#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "nipplejs": "^0.9.0",
-    "socket.io": "^4.1.3"
-  }
+  "homepage": "https://github.com/leciric/socket-royale#readme"
 }
