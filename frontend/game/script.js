@@ -13,12 +13,13 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 
 class Player {
-  constructor(id, x, y, radius, color) {
+  constructor(id, x, y, radius, color, live) {
     this.id = id;
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.live = live;
   }
 
   draw() {
@@ -75,7 +76,7 @@ socket.on('init', ({id, x, y}) => {
     
     playerId = id
     
-    players.push(new Player(id, x, y, 30, 'blue'));
+    players.push(new Player(id, x, y, 30, 'blue', 10));
   }
 })
 
@@ -116,7 +117,39 @@ function animate() {
       projectiles.splice(index, 1)
     }
   })
+  
+  isCollide()
 }
+
+function isCollide(){
+  if (players.length > 0){
+    players.forEach(playerItem => {
+      
+      if (projectiles.length > 0){
+        projectiles.forEach((projectile,index) => {
+          projectile.update();
+          var dx = playerItem.x - projectile.x;
+          var dy = playerItem.y - projectile.y;
+          var distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < playerItem.radius + projectile.radius){
+            //colisão detectada!
+            projectiles.splice(index,1)
+            playerItem.color = 'green';
+            playerItem.live = playerItem.live - 1;
+            if(playerItem.live <= 0){
+              playerItem.color = "#AA0000";
+            }
+            console.log(playerItem.live)
+          }
+
+        })
+      }
+    })
+  }
+}
+
+
 
 var reconnection = true,
   reconnectionDelay = 5000,
@@ -172,18 +205,29 @@ addEventListener('click', event => {
     y: Math.sin(angle) * 5,
   }
 
+  // salvando a localizacao do player
+  var pX, pY, pRad;
+
+  if(players.length > 0) {
+    players.forEach(playerItem => {
+      pX = playerItem.x;
+      pY = playerItem.y;
+      pRad = playerItem.radius;
+    })
+  }
 
   // instancia um novo projetil (ainda está com posição fixa de inicio, exatamente onde o player é instanciado)
   // Iremos implementar para isso acompanhar a posição do player.
   projectiles.push(new Projectile(
     {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
+      //utilizando a localização do player (inclui o radius do player para que o tiro ficasse para "fora" do jogador)
+      x: pX + pRad,
+      y: pY ,
       radius: 5,
       color: 'red',
       velocity,
     }
   ))
-}),
+});
 
   animate()
