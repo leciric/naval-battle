@@ -85,6 +85,9 @@ const projectiles = []
 
 const players = []
 
+
+
+
 function animate() {
   requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height)
@@ -93,6 +96,12 @@ function animate() {
 
     players.forEach(playerItem => {
       playerItem.draw();
+      var canvas = document.getElementById('myCanvas');
+      var contexto = canvas.getContext('2d');
+      contexto.font='28px arial';
+      contexto.lineWidth=4;
+      contexto.fillStyle='blue';
+      contexto.fillText('Vida: ' + playerItem.live,50,50);
     })
   }
 
@@ -123,8 +132,8 @@ function animate() {
 
 function isCollide(){
   if (players.length > 0){
-    players.forEach(playerItem => {
-      
+    players.forEach((playerItem, index) => {
+      var playerindex = index;
       if (projectiles.length > 0){
         projectiles.forEach((projectile,index) => {
           projectile.update();
@@ -138,9 +147,10 @@ function isCollide(){
             playerItem.color = 'green';
             playerItem.live = playerItem.live - 1;
             if(playerItem.live <= 0){
-              playerItem.color = "#AA0000";
+              //playerItem.color = "#AA0000";
+              players.splice(playerindex,1);
+              console.log('O jogador morreu!')
             }
-            console.log(playerItem.live)
           }
 
         })
@@ -221,7 +231,8 @@ addEventListener('click', event => {
   projectiles.push(new Projectile(
     {
       //utilizando a localização do player (inclui o radius do player para que o tiro ficasse para "fora" do jogador)
-      x: pX + pRad,
+      //precisa ver como utilizar a "frente" do jogador para iniciar o disparo.
+      x: pX + pRad + 5,
       y: pY ,
       radius: 5,
       color: 'red',
