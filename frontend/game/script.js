@@ -5,9 +5,13 @@ var form = document.getElementById('form');
 var input = document.getElementById('input');
 
 var shooting = true;
+var isDead = false;
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
+
+c.lineWidth=4;
+c.fillStyle='blue';
 
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -96,14 +100,16 @@ function animate() {
 
     players.forEach(playerItem => {
       playerItem.draw();
-      var canvas = document.getElementById('myCanvas');
-      var contexto = canvas.getContext('2d');
-      contexto.font='28px arial';
-      contexto.lineWidth=4;
-      contexto.fillStyle='blue';
-      contexto.fillText('Vida: ' + playerItem.live,50,50);
+      c.font='28px arial';
+      c.fillText('Vida: ' + playerItem.live,50,50);
     })
   }
+
+  if(isDead){
+    c.font='50px arial';
+    c.fillText('GAME OVER!!!', 50,50);
+  }
+    
 
   projectiles.forEach((projectile, index) => {
     projectile.update()
@@ -133,6 +139,7 @@ function animate() {
 function isCollide(){
   if (players.length > 0){
     players.forEach((playerItem, index) => {
+      //variável auxiliar para remoção do player da list
       var playerindex = index;
       if (projectiles.length > 0){
         projectiles.forEach((projectile,index) => {
@@ -147,8 +154,8 @@ function isCollide(){
             playerItem.color = 'green';
             playerItem.live = playerItem.live - 1;
             if(playerItem.live <= 0){
-              //playerItem.color = "#AA0000";
               players.splice(playerindex,1);
+              isDead = true;
               console.log('O jogador morreu!')
             }
           }
