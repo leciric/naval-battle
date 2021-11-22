@@ -16,8 +16,6 @@ socket royale uses some open source projects to work properly:
 
 ### 🔨 Installation
 
-don't be sendentary requires [node.js] to run.
-
 To run this project, you must install all dependecies running the command below inside the repo, then just start the project.
 
 ```sh
