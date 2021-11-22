@@ -9,12 +9,17 @@
 </head>
 <body>
 
-
   <div id="nipple"></div>
 
-<div class="button-wrapper">
-  <button>SHOT</button>
-</div>
+  <div class="button-wrapper" >
+    <button id="shot" onClick={handleButtonShotClick()}>SHOT</button>
+  </div>
+
+  <input type="text" id="playerIndex" placeholder="Digite o index do player" >
+
+  <button type="button" id="selectPlayer">Selecionar player</button>
+
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.9.0/nipplejs.js" integrity="sha512-f52aamMvYn4g3mneLwnjQycu4GnhkT8YUUFZADKR3MqoKgIKmwfLJ7vyPlNPQuh6t6xyz90gj126mF5GZjQNdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="./script.js"></script>
