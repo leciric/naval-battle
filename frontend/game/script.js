@@ -89,7 +89,7 @@ socket.on('init', ({ id, x, y }) => {
 
     playerId = id
 
-    players.push(new Player(id, x, y, 30, 'blue', 10, 0));
+    players.push(new Player(id, x, y, 30, 'blue', 1000, 0));
   }
 })
 
@@ -104,8 +104,8 @@ function animate() {
     players.forEach(playerItem => {
       console.log(playerItem)
       playerItem.draw();
-      c.font = '28px arial';
-      c.fillText('Vida: ' + playerItem.live, 50, 50);
+      c.font = '12px arial';
+      c.fillText('Vida: ' + playerItem.live, playerItem.x - 28, playerItem.y - 50);
     })
   }
 
