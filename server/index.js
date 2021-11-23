@@ -13,16 +13,25 @@ io.on('connection', client => {
   client.on('stop-moving', handleStopMoving);
   client.on('newGame', handleNewGame);
 
-  function handleNewGame({ x, y, canvasWidth, canvasHeight }) {
-    state.players.push({
+  function handleNewGame({canvasWidth, canvasHeight }) {
+    const player = {
       id: client.id,
-      y: 0,
-      x: 0,
+      y: canvasHeight / 2,
+      x: canvasWidth / 2,
+      color: 'blue',
+      radius: 30,
+      live: 10,
+      aim: 0,
+      velocity: {
+        x: 0,
+        y: 0,
+      },
       screen: client.id,
       canvasWidth,
       canvasHeight,
-    })
-    client.emit('init', { id: client.id, x, y });
+    }
+    state.players.push(player)
+    client.emit('init', player);
 
     startGameInterval();
   }
@@ -44,13 +53,14 @@ io.on('connection', client => {
   }
 
 
-  function handleMoving({ vector, force, angle }) {
-    const clientIndex = 0;
+  function handleMoving({ vector, force, angle, clientIndex }) {
 
     state.players[clientIndex] = {
       ...state.players[clientIndex],
-      x: vector.x * force,
-      y: vector.y * -force,
+      velocity: {
+        x: vector.x * force,
+        y: vector.y * -force,
+      },
       aim: angle.radian,
     }
   }
@@ -61,8 +71,10 @@ io.on('connection', client => {
 
     state.players[clientIndex] = {
       ...state.players[clientIndex],
-      x: 0,
-      y: 0,
+      velocity: {
+        x: 0,
+        y: 0,
+      }
     }
   }
 
@@ -88,50 +100,33 @@ io.on('connection', client => {
     }
   });
 
-  client.on('player-reachs-left', (msg) => {
-    const currentPlayer = state.players.find(item => item.id === client.id);
-
+  client.on('player-reachs-left', () => {
     const playerIndex = state.players.findIndex(item => item.id === client.id) - 1 !== -1 && state.players.findIndex(item => item.id === client.id) - 1
 
-    if (playerIndex) {
 
-      state.players.forEach(playerItem => {
-        if (currentPlayer) {
-          return (
-            {
-              ...playerItem,
-              x: state.players[playerIndex].canvasWidth,
-              screen: state.players[playerIndex].id,
-            }
-          )
-        }
+    // const playerIndex = state.players.findIndex(item => {
+    //   return state.players.flatMap(item2 => {
+    //     item2.screen === client.id
+    //   })
+    // })
 
-        return playerItem;
-      })
-      // io.to(state.players[playerIndex].id).emit('player-reachs-left', msg)
+    if (playerIndex >= 0) {
+      state.players[playerIndex + 1] = {
+        ...state.players[playerIndex + 1],
+        x: state.players[playerIndex].canvasWidth - 30,
+        screen: state.players[playerIndex].id,
+      }
     }
   });
 
-
-  client.on('player-reachs-right', (msg) => {
-    const currentPlayer = state.players.find(item => item.id === client.id);
+  client.on('player-reachs-right', () => {
     const playerIndex = state.players.findIndex(item => item.id === client.id) + 1 !== state.players.length && state.players.findIndex(item => item.id === client.id) + 1
-    if (playerIndex) {
-
-      state.players.forEach(playerItem => {
-        if (currentPlayer) {
-          return (
-            {
-              ...playerItem,
-              x: 5,
-              screen: state.players[playerIndex].id,
-            }
-          )
-        }
-
-        return playerItem;
-      })
-      // io.to(state.players[playerIndex].id).emit('player-reachs-right', msg)
+    if (playerIndex && playerIndex >= 0) {
+      state.players[playerIndex - 1] = {
+        ...state.players[playerIndex - 1],
+        x: 25,
+        screen: state.players[playerIndex].id,
+      }
     }
   });
 
@@ -142,6 +137,8 @@ function startGameInterval() {
   const intervalId = setInterval(() => {
     const winner = gameLoop(state);
 
+
+    
     if (!winner) {
       emitGameState(state)
     } else {
