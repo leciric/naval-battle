@@ -22,7 +22,7 @@ const joystick = nipplejs.create({
 
     joystick.on('move', (_, { vector, force, angle }) => {
 
-      socket.emit('moving', {vector, force, angle});
+      socket.emit('moving', {vector, force, angle, clientIndex: 0});
     })
 
     joystick.on('end', () => {

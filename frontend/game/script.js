@@ -70,7 +70,11 @@ let isGameStarted = false;
 
 
 if (!isGameStarted) {
-  socket.emit('newGame', { x: canvas.width / 2, y: canvas.height / 2, canvasWidth: canvas.width, canvasHeight: canvas.height });
+  socket.emit('newGame', 
+  { 
+    canvasWidth: canvas.width, 
+    canvasHeight: canvas.height,
+  });
 }
 
 // posição onde o player irá iniciar
@@ -84,12 +88,12 @@ const projectiles = []
 
 let players = []
 
-socket.on('init', ({ id, x, y }) => {
+socket.on('init', (player) => {
   if (!playerId) {
 
-    playerId = id
+    playerId = player.id
 
-    players.push(new Player(id, x, y, 30, 'blue', 10, 0));
+    players.push(new Player(player.id, player.x, player.y, player.radius, player.color, player.live, player.aim));
   }
 })
 
@@ -102,7 +106,6 @@ function animate() {
   if (players.length > 0) {
 
     players.forEach(playerItem => {
-      console.log(playerItem)
       playerItem.draw();
       c.font = '28px arial';
       c.fillText('Vida: ' + playerItem.live, 50, 50);
@@ -116,7 +119,6 @@ function animate() {
 
 
   projectiles.forEach((projectile, index) => {
-    console.log(projectile)
     projectile.update()
 
     if (projectile.x - projectile.radius < 0) {
@@ -202,22 +204,31 @@ var reconnection = true,
 socket.on('gameState', (state) => {
   const parsedState = JSON.parse(state)
 
+
   if (players.length > 0) {
 
     players.forEach(player => {
       const index = parsedState.players.findIndex(item => item.id === player.id)
 
-      if (index >= 0) {
+      const teste = parsedState.players.find(item => item.screen === playerId && item.id !== playerId)
 
-        if (player.screen === playerId) {
-          new Player(...item)
+      if (teste && teste.id !== playerId) {
+
+
+        const shouldCreate = players.find(item => item.id === teste.id)
+
+        if (!shouldCreate) {
+        console.log('should create')
+
+          players.push(new Player(teste.id, teste.x, teste.y, teste.radius, teste.color, teste.live, teste.aim))
+
+          console.log(players)
         }
-
-        console.log(players)
-
+      }
+      
+      if (index >= 0) {
         const selectedPlayer = parsedState.players[index]
-        player.update(selectedPlayer.x, selectedPlayer.y, selectedPlayer.aim)
-
+        player.update(selectedPlayer?.velocity?.x, selectedPlayer?.velocity?.y, selectedPlayer?.aim)
 
         if (selectedPlayer.isShooting) {
           // salvando a localizacao do player
@@ -262,14 +273,12 @@ socket.on('gameState', (state) => {
 
 // socket fica ouvindo esperando pelo evento de tiro que atingir o lado esquerdo
 socket.on('shot-reachs-left', msg => {
-  console.log('teste')
   projectiles.push(new Projectile({ ...msg, x: canvas.width }))
 });
 
 // socket fica ouvindo esperando pelo evento de tiro que atingir o lado direito
 socket.on('shot-reachs-right', msg => {
 
-  console.log(msg)
   projectiles.push(new Projectile({ ...msg, x: 5 }))
 });
 
