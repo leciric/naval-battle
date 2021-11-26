@@ -1,34 +1,31 @@
-const socket = io('http://192.168.15.6:3000/');
+const socket = io("http://localhost:3000/");
 
-const playerIndex = document.getElementById('playerIndex').value || 0;
-
-const shot = document.getElementById('shot');
-
-console.log(playerIndex)
+const shot = document.getElementById("shot");
 
 const joystick = nipplejs.create({
-      color: "#6e3216",
-      zone: document.getElementById("nipple"),
-      mode: "static",
-      position: {
-        left: '25%',
-        top: '50%'
-      },
-    });
+  color: "#6e3216",
+  zone: document.getElementById("nipple"),
+  mode: "static",
+  position: {
+    left: "25%",
+    top: "50%",
+  },
+});
 
-    let isMoving = false;
+joystick.on("move", (_, { vector, force, angle }) => {
+  const playerIndex = document.getElementById("playerIndex").value || 0;
 
-    console.log(isMoving)
+  socket.emit("moving", { vector, force, angle, playerIndex });
+});
 
-    joystick.on('move', (_, { vector, force, angle }) => {
+joystick.on("end", () => {
+  const playerIndex = document.getElementById("playerIndex").value || 0;
 
-      socket.emit('moving', {vector, force, angle, clientIndex: 0});
-    })
+  socket.emit("stop-moving", Number(playerIndex));
+});
 
-    joystick.on('end', () => {
-      socket.emit('stop-moving');
-    })
+function handleButtonShotClick() {
+  const playerIndex = document.getElementById("playerIndex").value || 0;
 
-    function handleButtonShotClick() {
-      socket.emit('shot', playerIndex);
-    }
+  socket.emit("shot", Number(playerIndex));
+}
