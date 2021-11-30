@@ -4,6 +4,7 @@ let isDead = false;
 
 const HEIGHT = window.innerHeight;
 const WIDTH = window.innerWidth;
+//const playerColor = ['blue','green','yellow','black','orange'];
 
 function createCanvas() {
   const canvasEl = document.querySelector("canvas");
@@ -46,14 +47,12 @@ function animate() {
   if (players.length > 0) {
     players.forEach((playerItem) => {
       playerItem.draw();
-      canvas.font = "28px arial";
-      canvas.fillText("Vida: " + playerItem.live, 50, 50);
     });
   }
 
   if (isDead) {
     canvas.font = "50px arial";
-    canvas.fillText("GAME OVER!!!", 50, 50);
+    canvas.fillText("GAME OVER!!!", WIDTH/2, HEIGHT/2);
   }
 
   projectiles.forEach((projectile, index) => {
@@ -79,22 +78,31 @@ function animate() {
   });
 
   players.forEach((player, index) => {
-    if (player.x - player.radius < 0) {
-      socket.emit("player-reachs-left", player);
-      players.splice(index, 1);
+    if (player.x - player.radius < 0){
+      if (player.screen != 0) {
+        socket.emit("player-reachs-left", player);
+        players.splice(index, 1);
+      }else{
+        player.x = 25;
+      }
     }
 
     if (player.x - player.radius > WIDTH) {
-      socket.emit("player-reachs-right", player);
-      players.splice(index, 1);
+      if(player.screen != players.length - 1){
+        socket.emit("player-reachs-right", player);
+        players.splice(index, 1);
+      }
+      else{
+        player.x = WIDTH - 30;
+      }
     }
 
-    if (player.y - player.radius > HEIGHT) {
-      player.y = HEIGHT - 5;
+    if (player.y - player.radius >= HEIGHT) {
+      player.y = HEIGHT - 30;
     }
 
-    if (player.y - player.radius < 0) {
-      player.y = 20;
+    if (player.y - player.radius <= 10) {
+      player.y = 30;
     }
   });
 
@@ -207,7 +215,11 @@ socket.on("shot-reachs-right", (projectile) => {
 });
 
 socket.on("player-reachs-left", (player) => {
-  players.push(new Player({ ...player }));
+  players.push(new Player({ ...player, x: WIDTH, screen: player.id - 1 }));
+});
+
+socket.on("player-reachs-right", (player) => {
+  players.push(new Player({ ...player, x: 0, screen: player.id + 1 }));
 });
 
 animate();
@@ -245,6 +257,7 @@ class Player {
     this.color = color;
     this.live = live;
     this.aim = aim;
+    //this.screen = screen;
   }
 
   draw() {
@@ -260,6 +273,8 @@ class Player {
       Math.PI * 2,
       false
     );
+    canvas.font = "16px arial";
+    canvas.fillText("Vida: " + this.live, this.x - 30, this.y - 50);
     canvas.fill();
     // pX + pRad * (Math.cos(angle))
   }

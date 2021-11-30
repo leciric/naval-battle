@@ -19,7 +19,7 @@ io.on("connection", (client) => {
       x: canvasWidth / 2,
       color: "blue",
       radius: 30,
-      live: 10,
+      live: 100,
       aim: 0,
       velocity: {
         x: 0,
@@ -102,32 +102,56 @@ io.on("connection", (client) => {
     }
   });
 
-  client.on("player-reachs-left", () => {
+  client.on("player-reachs-left", (player) => {
     const playerIndex = state.players.findIndex(
       (item) => item.id === client.id
     );
 
-    if (playerIndex !== -1) {
-      state.players[playerIndex] = {
-        ...state.players[playerIndex],
-        x: state.players[playerIndex].canvasWidth - 30,
-        screen: state.players[playerIndex].id,
-      };
+    if (playerIndex !== -1 && playerIndex > 0) {
+      io.to(state.players[playerIndex - 1].id).emit(
+        "player-reachs-left",
+        player
+      );
     }
+    
+    // const playerIndex = state.players.findIndex(
+    //   (item) => item.id === client.id
+    // );
+
+    // if (playerIndex !== -1) {
+    //   state.players[playerIndex] = {
+    //     ...state.players[playerIndex],
+    //     x: state.players[playerIndex].canvasWidth - 30,
+    //     screen: state.players[playerIndex].id,
+    //   };
+    // }
   });
 
-  client.on("player-reachs-right", () => {
+  client.on("player-reachs-right", (player) => {
     const playerIndex = state.players.findIndex(
       (item) => item.id === client.id
     );
 
-    if (playerIndex !== -1) {
-      state.players[playerIndex] = {
-        ...state.players[playerIndex],
-        x: 25,
-        screen: state.players[playerIndex].id,
-      };
+    if (
+      playerIndex !== -1 &&
+      playerIndex !== state.players.length - 1
+    ) {
+      io.to(state.players[playerIndex + 1].id).emit(
+        "player-reachs-right",
+        player
+      );
     }
+    // const playerIndex = state.players.findIndex(
+    //   (item) => item.id === client.id
+    // );
+
+    // if (playerIndex !== -1) {
+    //   state.players[playerIndex] = {
+    //     ...state.players[playerIndex],
+    //     x: 30,
+    //     screen: state.players[playerIndex].id,
+    //   };
+    // }
   });
 
   client.on("disconnect", () => {
