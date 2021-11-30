@@ -25,11 +25,14 @@ io.on("connection", (client) => {
         x: 0,
         y: 0,
       },
-      screen: client.id,
+      screen: 0,
+      name: 0,
       canvasWidth,
       canvasHeight,
     };
     state.players.push(player);
+    player.screen = state.players.length - 1;
+    player.name = state.players.length - 1;
     client.emit("init", player);
 
     startGameInterval();
@@ -107,7 +110,7 @@ io.on("connection", (client) => {
       (item) => item.id === client.id
     );
 
-    if (playerIndex !== -1 && playerIndex > 0) {
+    if (playerIndex !== -1 && player.screen > 0) {
       io.to(state.players[playerIndex - 1].id).emit(
         "player-reachs-left",
         player
@@ -132,10 +135,8 @@ io.on("connection", (client) => {
       (item) => item.id === client.id
     );
 
-    if (
-      playerIndex !== -1 &&
-      playerIndex !== state.players.length - 1
-    ) {
+    if (playerIndex !== -1 &&
+        player.screen !== state.players.length - 1) {
       io.to(state.players[playerIndex + 1].id).emit(
         "player-reachs-right",
         player

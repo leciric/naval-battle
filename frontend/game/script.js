@@ -26,7 +26,7 @@ socket.emit("newGame", {
   canvasHeight: HEIGHT,
 });
 
-// array de projeteis disparados
+// array de projeteis disparados e de jogadores
 const projectiles = [];
 const players = [];
 
@@ -79,6 +79,7 @@ function animate() {
 
   players.forEach((player, index) => {
     if (player.x - player.radius < 0){
+      
       if (player.screen != 0) {
         socket.emit("player-reachs-left", player);
         players.splice(index, 1);
@@ -88,7 +89,7 @@ function animate() {
     }
 
     if (player.x - player.radius > WIDTH) {
-      if(player.screen != players.length - 1){
+      if(player.screen <= (players.length - 1)){
         socket.emit("player-reachs-right", player);
         players.splice(index, 1);
       }
@@ -101,7 +102,7 @@ function animate() {
       player.y = HEIGHT - 30;
     }
 
-    if (player.y - player.radius <= 10) {
+    if (player.y - player.radius <= 30) {
       player.y = 30;
     }
   });
@@ -124,8 +125,9 @@ function isCollide() {
           if (distance < playerItem.radius + projectile.radius) {
             //colisão detectada!
             projectiles.splice(index, 1);
-            playerItem.color = "green";
             playerItem.live = playerItem.live - 1;
+            if (playerItem.live < 60) {playerItem.color = "green";}
+            if (playerItem.live < 30) {playerItem.color = "orange";}
             if (playerItem.live <= 0) {
               players.splice(playerindex, 1);
               isDead = true;
@@ -215,11 +217,11 @@ socket.on("shot-reachs-right", (projectile) => {
 });
 
 socket.on("player-reachs-left", (player) => {
-  players.push(new Player({ ...player, x: WIDTH, screen: player.id - 1 }));
+  players.push(new Player({ ...player, x: WIDTH, screen: player.screen - 1 }));
 });
 
 socket.on("player-reachs-right", (player) => {
-  players.push(new Player({ ...player, x: 0, screen: player.id + 1 }));
+  players.push(new Player({ ...player, x: 30, screen: player.screen + 1 }));
 });
 
 animate();
@@ -249,7 +251,7 @@ function handleDisconnect() {
 }
 
 class Player {
-  constructor({ id, x, y, radius, color, live, aim }) {
+  constructor({ id, x, y, radius, color, live, aim, screen, name}) {
     this.id = id;
     this.x = x;
     this.y = y;
@@ -257,7 +259,8 @@ class Player {
     this.color = color;
     this.live = live;
     this.aim = aim;
-    //this.screen = screen;
+    this.screen = screen;
+    this.name = name;
   }
 
   draw() {
@@ -274,7 +277,8 @@ class Player {
       false
     );
     canvas.font = "16px arial";
-    canvas.fillText("Vida: " + this.live, this.x - 30, this.y - 50);
+    canvas.fillText("Player" + this.name , this.x - 25, this.y - 80);
+    canvas.fillText(" Vida: " + this.live + " Tela: " + this.screen, this.x - 50, this.y - 50);
     canvas.fill();
     // pX + pRad * (Math.cos(angle))
   }
