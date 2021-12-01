@@ -1,1 +1,3 @@
-/server/node_modules
+server/node_modules
+frontend/controls/node_modules
+frontend/game/node_modules
